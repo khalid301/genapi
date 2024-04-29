@@ -11,11 +11,11 @@ class GunicornConfig(BaseSettings):
     LOG_DEBUG: str = "DEBUG"
     LOG_ERROR: str = "ERROR"
     DB_DIALECT: str = "postgresql"
-    DB_HOST: str = "103.41.206.233"
+    DB_HOST: str = ""
     DB_PORT: int = 5432
-    DB_USERNAME: str = "postgres"
-    DB_PASSWORD: str = "r00t_db"
-    DB_NAME: str = "crm"
+    DB_USERNAME: str = ""
+    DB_PASSWORD: str = ""
+    DB_NAME: str = ""
 
     class Config:
         env_prefix = "RG_DS_CHATBOT_API_GUNICORN_"
