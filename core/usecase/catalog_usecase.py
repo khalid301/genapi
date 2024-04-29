@@ -174,7 +174,7 @@ class CatalogUseCase:
 
         if len(primary_key) == 0:
             return {'error': 'Primary key is required'}
-
+        
         # check mandatory column
         req_column = GetTableColumnsRequest(
             schema_name=req.schema_name,
@@ -190,5 +190,28 @@ class CatalogUseCase:
                 return {'error': f'{mandatory_column} is mandatory'}
 
         result = await self.CatalogRepo.create_table_record(req)
+
+        return result
+
+    async def update_table_record(self, req: CreateTableRecordRequest):
+        # first, get the primary key
+        req_attr = GetTableAttributesRequest(
+            schema_name=req.schema_name,
+            table_name=req.table_name
+        )
+        primary_key = await self.get_primary_key(req_attr)
+
+        primary_key_list = []
+        for key in primary_key:
+            primary_key_list.append(key['attname'])
+
+        if len(primary_key) == 0:
+            return {'error': 'Primary key is required'}
+
+        # for now, we only support single primary key
+        if req.primary_key_column is None:
+            req.primary_key_column = primary_key_list[0]
+
+        result = await self.CatalogRepo.update_table_record(req)
 
         return result

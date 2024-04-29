@@ -107,31 +107,14 @@ async def create_table_record(req: CreateTableRecordRequest):
     return data
 
 
-# @app.get("/articles")
-# async def get_articles(page: int = 1, page_size:int = 2, keyword: str = "", with_gambar: bool = True):
-#     req = GetArticlesRequest(
-#         page=page,
-#         page_size=page_size,
-#         keyword=keyword,
-#         with_gambar=with_gambar
-#     )
-#     articles = await ArticleUseCase().get_articles(req)
-#
-#     return articles
-#
-#
-# @app.get("/article/{id}")
-# async def get_article(id: int, with_gambar: bool = True):
-#     req = GetArticleByIDRequest(
-#         id=id,
-#         with_gambar=with_gambar
-#     )
-#     article = await ArticleUseCase().get_article_by_id(req)
-#
-#     if article is None:
-#         raise HTTPException(status_code=404, detail="Article not found")
-#     return article
+@app.patch("/data/table")
+async def update_table_record(req: CreateTableRecordRequest):
+    schema_name, table_name = normalize_schema_and_table_name(req.schema_name, req.table_name)
+    req.table_name = table_name
+    req.schema_name = schema_name
 
+    data = await CatalogUseCase().update_table_record(req)
+    return data
 
 if __name__ == '__main__':
     uvicorn.run("main:core", host=GUNICORN_CONFIG.HOST, port=GUNICORN_CONFIG.PORT, reload=True)

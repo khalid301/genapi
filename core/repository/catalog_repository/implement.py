@@ -288,3 +288,39 @@ class CatalogRepository(ABC):
             # Return the error message as a response
             return {'error': str(e)}
 
+    async def update_table_record(self, req: CreateTableRecordRequest):
+        try:
+            req_attr = GetTableColumnsRequest(
+                schema_name=req.schema_name,
+                table_name=req.table_name
+            )
+            columns = await self.get_table_columns(req_attr)
+
+            req.data = self.QueryParser.audition_insert_column(columns, req.data)
+
+            # Prepare the SQL UPDATE statement
+            set_clause = ', '.join([f"{key} = :{key}" for key in req.data.keys()])
+
+            query = text(f'''UPDATE {req.schema_name}.{req.table_name} 
+                            SET {set_clause} 
+                            WHERE {req.primary_key_column} = :{req.primary_key_column} 
+                            RETURNING *''')
+
+            # Execute the query
+            result_proxy = self.session.execute(query, req.data)
+
+            # commit session
+            self.session.commit()
+
+            # Get the column names from the ResultProxy
+            column_names = result_proxy.keys()
+
+            # Fetch the updated row
+            row = result_proxy.fetchone()
+
+            # Convert the row to a dictionary using the column names as keys
+            return dict(zip(column_names, row))
+
+        except SQLAlchemyError as e:
+            # Return the error message as a response
+            return {'error': str(e)}

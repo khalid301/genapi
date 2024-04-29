@@ -18,7 +18,7 @@ class GunicornConfig(BaseSettings):
     DB_NAME: str = ""
 
     class Config:
-        env_prefix = "RG_DS_CHATBOT_API_GUNICORN_"
+        env_prefix = "GENAPI_"
 
 
 GUNICORN_CONFIG = GunicornConfig()
